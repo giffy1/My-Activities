@@ -156,12 +156,6 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         //TODO : (Assignment 0) Register the accelerometer sensor from the sensor manager.
 
         //TODO : (Assignment 1) Register your step detector. Register an OnStepListener to receive step events
-
-        // built-in step detector only available for API level 19 and above
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mStepSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
-            mSensorManager.registerListener(this, mStepSensor, SensorManager.SENSOR_DELAY_GAME);
-        }
     }
 
     /**
