@@ -1,0 +1,15 @@
+cs.umass.edu.myactivitiestoolkit
+cs.umass.edu.myactivitiestoolkit.audio
+cs.umass.edu.myactivitiestoolkit.clustering
+cs.umass.edu.myactivitiestoolkit.constants
+cs.umass.edu.myactivitiestoolkit.location
+cs.umass.edu.myactivitiestoolkit.ppg
+cs.umass.edu.myactivitiestoolkit.processing
+cs.umass.edu.myactivitiestoolkit.services
+cs.umass.edu.myactivitiestoolkit.services.msband
+cs.umass.edu.myactivitiestoolkit.steps
+cs.umass.edu.myactivitiestoolkit.storage
+cs.umass.edu.myactivitiestoolkit.util
+cs.umass.edu.myactivitiestoolkit.view.activities
+cs.umass.edu.myactivitiestoolkit.view.fragments
+cs.umass.edu.myactivitiestoolkit.view.preference
