@@ -4,7 +4,7 @@ Created on Wed Sep  7 15:34:11 2016
 
 Assignment A0 : Data Collection
 
-@author: cs390mb
+@author: cs390mb & Group 5 - Colin Stern
 
 This Python script receives incoming data through the server and 
 passes it to the process() method on a separate thread. Your job 
@@ -27,9 +27,11 @@ user_id = "75.6d.a4.38.38.e7.2d.96.76.a9"
 sumX = 0
 sumY = 0
 sumZ = 0
-counter = 1
+counter = 0
 
 def process(timestamp, values):
+
+
     """
     Process incoming accelerometer data.
     
@@ -64,8 +66,7 @@ def process(timestamp, values):
     Each set of brackets represents a replaceable value.
     
     """
-    
-    print("Received data" + str(counter))
+    print("Received data")
 
     global sumX
     global sumY
@@ -77,16 +78,14 @@ def process(timestamp, values):
     sumY += values[1]
     sumZ += values[2]
     counter += 1
-
-
-    if counter >= 11:
-        print(str(sumX/counter) + " " + str(sumY/counter) + " " + str(sumZ/counter))
+ 
+    if counter >= 100:
+        print(str(sumX/counter) + " " + str(sumY/counter) + " " +  str(sumZ/counter))   
         sumX = 0
         sumY = 0
         sumZ = 0
-        counter = 1
-        
-
+        counter = 0
+       
 #################   Server Connection Code  ####################
 
 '''

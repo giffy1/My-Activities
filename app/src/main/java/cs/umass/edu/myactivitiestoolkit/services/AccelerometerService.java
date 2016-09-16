@@ -39,6 +39,7 @@ import edu.umass.cs.MHLClient.sensors.SensorReading;
  *      use the {@link #mClient} object to send data to the server. You can
  *      confirm it works by checking that both the local and server-side plots
  *      are updating (make sure your html script is running on your machine!).
+ *      APP, VISUALIZATION, PYTHON SCRIPT RUN SUCCESSFUL 9/16 7:30PM, READY FOR A0 SUBMISSION
  * <br><br>
  *
  * <b>ASSIGNMENT 1 (Step Detection)</b> :
