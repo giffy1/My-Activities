@@ -39,6 +39,7 @@ import edu.umass.cs.MHLClient.sensors.SensorReading;
  *      use the {@link #mClient} object to send data to the server. You can
  *      confirm it works by checking that both the local and server-side plots
  *      are updating (make sure your html script is running on your machine!).
+ *      APP, VISUALIZATION, PYTHON SCRIPT RUN SUCCESSFUL 9/16 7:30PM, READY FOR A0 SUBMISSION
  * <br><br>
  *
  * <b>ASSIGNMENT 1 (Step Detection)</b> :
@@ -152,8 +153,9 @@ public class AccelerometerService extends SensorService implements SensorEventLi
      */
     @Override
     protected void registerSensors(){
-
-        //TODO : (Assignment 0) Register the accelerometer sensor from the sensor manager.
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mAccelerometerSensor =  mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         //TODO : (Assignment 1) Register your step detector. Register an OnStepListener to receive step events
     }
@@ -163,7 +165,9 @@ public class AccelerometerService extends SensorService implements SensorEventLi
      */
     @Override
     protected void unregisterSensors() {
-        //TODO : Unregister your sensors. Make sure mSensorManager is not null before calling its unregisterListener method.
+        if (mAccelerometerSensor != null) {
+            mSensorManager.unregisterListener(this, mAccelerometerSensor);
+        }
     }
 
     @Override
@@ -215,9 +219,9 @@ public class AccelerometerService extends SensorService implements SensorEventLi
             // convert the timestamp to milliseconds (note this is not in Unix time)
             long timestamp_in_milliseconds = (long) ((double) event.timestamp / Constants.TIMESTAMPS.NANOSECONDS_PER_MILLISECOND);
 
-            //TODO: Send the accelerometer reading to the server
+            broadcastAccelerometerReading(timestamp_in_milliseconds, event.values);
 
-            //TODO: broadcast the accelerometer reading to the UI
+            mClient.sendSensorReading(new AccelerometerReading(mUserID, "MOBILE", "", timestamp_in_milliseconds, event.values));
 
         }else if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
 
@@ -243,6 +247,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
      */
     public void broadcastAccelerometerReading(final long timestamp, final float[] accelerometerReadings) {
         Intent intent = new Intent();
+        intent.putExtra(Constants.KEY.TIMESTAMP, timestamp);
         intent.putExtra(Constants.KEY.ACCELEROMETER_DATA, accelerometerReadings);
         intent.setAction(Constants.ACTION.BROADCAST_ACCELEROMETER_DATA);
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
