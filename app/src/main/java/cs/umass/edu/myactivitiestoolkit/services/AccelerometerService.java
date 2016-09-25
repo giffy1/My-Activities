@@ -6,17 +6,21 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.Locale;
 
 import cs.umass.edu.myactivitiestoolkit.R;
 import cs.umass.edu.myactivitiestoolkit.constants.Constants;
+import cs.umass.edu.myactivitiestoolkit.processing.Filter;
 import cs.umass.edu.myactivitiestoolkit.steps.OnStepListener;
 import cs.umass.edu.myactivitiestoolkit.steps.StepDetector;
 import edu.umass.cs.MHLClient.client.MessageReceiver;
@@ -102,6 +106,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     /** The step count as predicted by the Android built-in step detection algorithm. */
     private int mAndroidStepCount = 0;
 
+    private Filter mfilter;
     public AccelerometerService(){
         mStepDetector = new StepDetector();
     }
@@ -173,7 +178,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
             }
         };
 
-        mSensorManager.registerListener(mStepDetector, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL;
+        mSensorManager.registerListener(mStepDetector, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL);
         mStepDetector.registerOnStepListener(stepListener);
     }
 
@@ -240,11 +245,23 @@ public class AccelerometerService extends SensorService implements SensorEventLi
             long timestamp_in_milliseconds = (long) ((double) event.timestamp / Constants.TIMESTAMPS.NANOSECONDS_PER_MILLISECOND);
 
             //TODO: Send the accelerometer reading to the server
+            float[] values = new float[6];
+            mfilter = new Filter(0);
+
+            System.arraycopy(event.values,0,values,0,3);
+            double[] doubleValues = mfilter.getFilteredValues(event.values);
+            for(int i = 0; i < doubleValues.length; i++)
+            {
+                values[3+i] = doubleValues.length;
+            }
+//            System.arraycopy(mfilter.getFilteredValues(event.values),0,values,3,3);
+
+
             AccelerometerReading reading = new AccelerometerReading(
                     this.mUserID, "MOBILE",
                     "",
                     timestamp_in_milliseconds,
-                    event.values
+                    values
             );
 
             mClient.sendSensorReading(reading);
