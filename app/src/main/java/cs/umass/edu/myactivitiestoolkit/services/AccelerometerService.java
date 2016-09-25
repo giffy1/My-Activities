@@ -17,6 +17,7 @@ import java.util.Locale;
 
 import cs.umass.edu.myactivitiestoolkit.R;
 import cs.umass.edu.myactivitiestoolkit.constants.Constants;
+import cs.umass.edu.myactivitiestoolkit.steps.OnStepListener;
 import cs.umass.edu.myactivitiestoolkit.steps.StepDetector;
 import edu.umass.cs.MHLClient.client.MessageReceiver;
 import edu.umass.cs.MHLClient.client.MobileIOClient;
@@ -159,6 +160,8 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         //TODO : (Assignment 1) Register your step detector. Register an OnStepListener to receive step events
+        mStepSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        mSensorManager.registerListener(this, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     /**
@@ -169,6 +172,8 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         //TODO : Unregister your sensors. Make sure mSensorManager is not null before calling its unregisterListener method.
         if(mSensorManager != null) {
             mSensorManager.unregisterListener(this, mAccelerometerSensor);
+            mSensorManager.unregisterListener(this, mStepSensor);
+            mSensorManager.unregisterListener(OnStepListener, mStepSensor);
         }
     }
 
