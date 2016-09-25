@@ -162,6 +162,19 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         //TODO : (Assignment 1) Register your step detector. Register an OnStepListener to receive step events
         mStepSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
         mSensorManager.registerListener(this, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        OnStepListener stepListener = new OnStepListener() {
+            @Override
+            public void onStepCountUpdated(int stepCount) {
+            }
+
+            @Override
+            public void onStepDetected(long timestamp, float[] values) {
+            }
+        };
+
+        mSensorManager.registerListener(mStepDetector, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL;
+        mStepDetector.registerOnStepListener(stepListener);
     }
 
     /**
@@ -171,9 +184,9 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     protected void unregisterSensors() {
         //TODO : Unregister your sensors. Make sure mSensorManager is not null before calling its unregisterListener method.
         if(mSensorManager != null) {
-            mSensorManager.unregisterListener(this, mAccelerometerSensor);
-            mSensorManager.unregisterListener(this, mStepSensor);
-            mSensorManager.unregisterListener(OnStepListener, mStepSensor);
+            mSensorManager.unregisterListener(this);
+            mSensorManager.unregisterListener(mStepDetector);
+            mStepDetector.unregisterOnStepListeners();
         }
     }
 
@@ -298,7 +311,6 @@ public class AccelerometerService extends SensorService implements SensorEventLi
 
 
     // TODO: (Assignment 1) Broadcast the step count as computed by your server-side algorithm.
-
 
     /**
      * Broadcasts a step event to other application components, e.g. the main UI.
