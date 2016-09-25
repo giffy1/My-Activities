@@ -249,10 +249,13 @@ public class AccelerometerService extends SensorService implements SensorEventLi
             mfilter = new Filter(0);
 
             System.arraycopy(event.values,0,values,0,3);
-            double[] doubleValues = mfilter.getFilteredValues(event.values);
-            for(int i = 0; i < doubleValues.length; i++)
+            double[] dFilteredValues = mfilter.getFilteredValues(event.values);
+            float[] fFilteredValues =  new float[3];
+
+            for(int i = 0; i < dFilteredValues.length; i++)
             {
-                values[3+i] = doubleValues.length;
+                values[3+i] = (float) dFilteredValues[i];
+                fFilteredValues[i] = (float) dFilteredValues[i];
             }
 //            System.arraycopy(mfilter.getFilteredValues(event.values),0,values,3,3);
 
@@ -261,7 +264,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
                     this.mUserID, "MOBILE",
                     "",
                     timestamp_in_milliseconds,
-                    values
+                    fFilteredValues
             );
 
             mClient.sendSensorReading(reading);
