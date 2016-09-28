@@ -17,6 +17,7 @@ import java.util.Locale;
 
 import cs.umass.edu.myactivitiestoolkit.R;
 import cs.umass.edu.myactivitiestoolkit.constants.Constants;
+import cs.umass.edu.myactivitiestoolkit.processing.Filter;
 import cs.umass.edu.myactivitiestoolkit.steps.OnStepListener;
 import cs.umass.edu.myactivitiestoolkit.steps.StepDetector;
 import edu.umass.cs.MHLClient.client.MessageReceiver;
@@ -173,7 +174,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
             }
         };
 
-        mSensorManager.registerListener(mStepDetector, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL;
+        mSensorManager.registerListener(mStepDetector, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL);
         mStepDetector.registerOnStepListener(stepListener);
     }
 
@@ -231,6 +232,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
      * @see SensorEvent
      * @see #broadcastAccelerometerReading(long, float[])
      */
+
 
     @Override
     public void onSensorChanged(SensorEvent event) {

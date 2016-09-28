@@ -101,7 +101,7 @@ public class Constants {
      * </pre>
      */
     public interface MHLClientFilter {
-        String STEP_DETECTED = "STEP_DETECTED";
+        String STEP_DETECTED = "SENSOR_STEP";
         String ACTIVITY_DETECTED = "ACTIVITY_DETECTED";
         String SPEAKER_DETECTED = "SPEAKER_DETECTED";
         String CLUSTER = "CLUSTER";
