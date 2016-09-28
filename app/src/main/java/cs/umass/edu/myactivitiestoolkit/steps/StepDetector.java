@@ -4,8 +4,13 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.util.Log;
-
+import java.util.AbstractQueue;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
 import cs.umass.edu.myactivitiestoolkit.processing.Filter;
 
@@ -17,11 +22,13 @@ import cs.umass.edu.myactivitiestoolkit.processing.Filter;
 public class StepDetector implements SensorEventListener {
     /** Used for debugging purposes. */
     @SuppressWarnings("unused")
+
     private static final String TAG = StepDetector.class.getName();
 
     /** Maintains the set of listeners registered to handle step events. **/
     private ArrayList<OnStepListener> mStepListeners;
 
+    private ArrayList<SensorEvent> mEventBuffer;
     /**
      * The number of steps taken.
      */
@@ -29,6 +36,7 @@ public class StepDetector implements SensorEventListener {
 
     public StepDetector(){
         mStepListeners = new ArrayList<>();
+        mEventBuffer = new ArrayList<>();
         stepCount = 0;
     }
 
@@ -69,10 +77,25 @@ public class StepDetector implements SensorEventListener {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
             //TODO: Detect steps! Call onStepDetected(...) when a step is detected.
+            mEventBuffer.add(event);
+            long minimumTimestamp = event.timestamp - (long)(1.5 * Math.pow(10,9));
+            mEventBuffer.removeAll(mEventBuffer.subList(0,getNearestTimestampMatch(minimumTimestamp)));
 
         }
     }
-
+    private int getNearestTimestampMatch(long timestamp)
+    {
+        long[] timestampArray = new long[mEventBuffer.size()];
+        NavigableSet<Long> set = new TreeSet<>();
+        Map<SensorEvent[],Long[]> map = new HashMap<>();
+        for (int i = 0; i < mEventBuffer.size(); i++) {
+            long stamp = mEventBuffer.get(i).timestamp;
+            timestampArray[i] = stamp;
+            set.add(stamp);
+        }
+        long item = set.floor(timestamp);
+        return Arrays.binarySearch(timestampArray,item);
+    }
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
         // do nothing
