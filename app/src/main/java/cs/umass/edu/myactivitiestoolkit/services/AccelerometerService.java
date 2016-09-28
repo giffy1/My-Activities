@@ -247,7 +247,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
 
             //TODO: Send the accelerometer reading to the server
             float[] values = new float[6];
-            mfilter = new Filter(0);
+            mfilter = new Filter(10);
 
             System.arraycopy(event.values,0,values,0,3);
             double[] dFilteredValues = mfilter.getFilteredValues(event.values);
@@ -273,7 +273,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
             //TODO: broadcast the accelerometer reading to the UI
             broadcastAccelerometerReading(timestamp_in_milliseconds, event.values);
 
-        }else if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+        }else if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR   ) {
 
             // we received a step event detected by the built-in Android step detector (assignment 1)
             broadcastAndroidStepCount(mAndroidStepCount++);
