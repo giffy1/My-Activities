@@ -3,13 +3,15 @@ package cs.umass.edu.myactivitiestoolkit.steps;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.util.Log;
-import java.util.AbstractQueue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import cs.umass.edu.myactivitiestoolkit.processing.Filter;
@@ -29,15 +31,20 @@ public class StepDetector implements SensorEventListener {
     private ArrayList<OnStepListener> mStepListeners;
 
     private ArrayList<SensorEvent> mEventBuffer;
+//    private Map<Long, float[]> EventBuffer;
     /**
      * The number of steps taken.
      */
     private int stepCount;
+    private Filter mFilter;
 
     public StepDetector(){
         mStepListeners = new ArrayList<>();
         mEventBuffer = new ArrayList<>();
         stepCount = 0;
+        mFilter = new Filter (2);
+//        EventBuffer = new LinkedHashMap<Long, float[]>();
+
     }
 
     /**
@@ -77,17 +84,56 @@ public class StepDetector implements SensorEventListener {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
             //TODO: Detect steps! Call onStepDetected(...) when a step is detected.
+
+            // mEventBuffer is the window to do analysis
+//            EventBuffer.put(event.timestamp,event.values);
             mEventBuffer.add(event);
             long minimumTimestamp = event.timestamp - (long)(1.5 * Math.pow(10,9));
-            mEventBuffer.removeAll(mEventBuffer.subList(0,getNearestTimestampMatch(minimumTimestamp)));
+            mEventBuffer.removeAll(mEventBuffer.subList(0,getNearestTimestampMatch(minimumTimestamp))); // dumps data that is a older than 1.5 seconds
+//            EventBuffer.keySet().removeAll()
+            //algorithm
+            TreeMap<Long,Float> map = new TreeMap<>();
+            //math function converts the three waveforms to a single signal
+            for (SensorEvent e: mEventBuffer) {
+                double[] fValues =  mFilter.getFilteredValues(event.values);
+//                float[] fValues = event.values;
+                for (int i = 0; i < fValues.length; i++) {
+                    fValues[i] = Math.pow(fValues[i]+100000, 2); // the addition and subtraction of 100000 lets negative values retain their meaning
+//                    fValues[i] =(float) Math.pow(fValues[i]+100000, 2); // the addition and subtraction of 100000 lets negative values retain their meaning
+                }
+                map.put(e.timestamp, (float) Math.sqrt(fValues[0]+fValues[1]+fValues[2])-100000);
+            }
+            Collection<Float> list = map.values();
+            float upper = Collections.max(list);
+            float lower = Collections.min(list);
+            float center = (upper + lower)/2;
+            float minimumRange= (float)0.5;
+            // disregard noise at about center value
+            if (!(upper < center+minimumRange && lower > center-minimumRange)){
+                long top = getKeyByValue(upper,map);
+                long bottom = getKeyByValue(lower,map);
+                // down turn of a wave where the slope is negative
+                if (top < bottom){
+                    onStepDetected(bottom,event.values);
+                }
+            }
 
         }
+    }
+    private long getKeyByValue(float value,Map<Long,Float> map){
+        long result = -1;
+        for (long key :
+                map.keySet()) {
+            if (map.get(key).equals(value)) {
+                result = key;
+            }
+        }
+        return result;
     }
     private int getNearestTimestampMatch(long timestamp)
     {
         long[] timestampArray = new long[mEventBuffer.size()];
         NavigableSet<Long> set = new TreeSet<>();
-        Map<SensorEvent[],Long[]> map = new HashMap<>();
         for (int i = 0; i < mEventBuffer.size(); i++) {
             long stamp = mEventBuffer.get(i).timestamp;
             timestampArray[i] = stamp;
