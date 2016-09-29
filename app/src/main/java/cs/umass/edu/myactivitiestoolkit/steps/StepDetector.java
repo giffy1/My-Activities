@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeMap;
@@ -31,7 +30,6 @@ public class StepDetector implements SensorEventListener {
     private ArrayList<OnStepListener> mStepListeners;
 
     private ArrayList<SensorEvent> mEventBuffer;
-//    private Map<Long, float[]> EventBuffer;
     /**
      * The number of steps taken.
      */
@@ -43,8 +41,6 @@ public class StepDetector implements SensorEventListener {
         mEventBuffer = new ArrayList<>();
         stepCount = 0;
         mFilter = new Filter (2);
-//        EventBuffer = new LinkedHashMap<Long, float[]>();
-
     }
 
     /**
@@ -85,21 +81,16 @@ public class StepDetector implements SensorEventListener {
 
             //TODO: Detect steps! Call onStepDetected(...) when a step is detected.
 
-            // mEventBuffer is the window to do analysis
-//            EventBuffer.put(event.timestamp,event.values);
             mEventBuffer.add(event);
             long minimumTimestamp = event.timestamp - (long)(1.5 * Math.pow(10,9));
             mEventBuffer.removeAll(mEventBuffer.subList(0,getNearestTimestampMatch(minimumTimestamp))); // dumps data that is a older than 1.5 seconds
-//            EventBuffer.keySet().removeAll()
             //algorithm
             TreeMap<Long,Float> map = new TreeMap<>();
             //math function converts the three waveforms to a single signal
             for (SensorEvent e: mEventBuffer) {
                 double[] fValues =  mFilter.getFilteredValues(event.values);
-//                float[] fValues = event.values;
                 for (int i = 0; i < fValues.length; i++) {
                     fValues[i] = Math.pow(fValues[i]+100000, 2); // the addition and subtraction of 100000 lets negative values retain their meaning
-//                    fValues[i] =(float) Math.pow(fValues[i]+100000, 2); // the addition and subtraction of 100000 lets negative values retain their meaning
                 }
                 map.put(e.timestamp, (float) Math.sqrt(fValues[0]+fValues[1]+fValues[2])-100000);
             }
@@ -115,8 +106,10 @@ public class StepDetector implements SensorEventListener {
                 // down turn of a wave where the slope is negative
                 if (top < bottom){
                     onStepDetected(bottom,event.values);
+                    mEventBuffer.clear(); //dump current window to prevent further analysis on that set of data
                 }
             }
+            map.clear(); //gc
 
         }
     }
