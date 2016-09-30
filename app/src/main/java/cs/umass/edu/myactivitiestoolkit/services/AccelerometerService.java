@@ -171,6 +171,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         OnStepListener stepListener = new OnStepListener() {
             @Override
             public void onStepCountUpdated(int stepCount) {
+                broadcastLocalStepCount(stepCount);
             }
 
             @Override
@@ -273,7 +274,6 @@ public class AccelerometerService extends SensorService implements SensorEventLi
 
             // we received a step event detected by the built-in Android step detector (assignment 1)
             broadcastAndroidStepCount(mAndroidStepCount++);
-            broadcastLocalStepCount(mStepDetector.stepCount);
 
         } else {
 
