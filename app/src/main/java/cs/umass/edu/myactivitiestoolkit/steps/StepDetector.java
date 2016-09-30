@@ -36,11 +36,16 @@ public class StepDetector implements SensorEventListener {
     private int stepCount;
     private Filter mFilter;
 
+    //tweakable values
+    private float minimumRange = 0.5f; //noise with a occurs within a bound that occurs <minimumRange> around the center
+    private int smoothingFactor = 2; //smoothing factor for the filter within the StepDetector
+
     public StepDetector(){
         mStepListeners = new ArrayList<>();
         mEventBuffer = new ArrayList<>();
         stepCount = 0;
-        mFilter = new Filter (2);
+        mFilter = new Filter(smoothingFactor);
+
     }
 
     /**
@@ -81,35 +86,43 @@ public class StepDetector implements SensorEventListener {
 
             //TODO: Detect steps! Call onStepDetected(...) when a step is detected.
 
-            mEventBuffer.add(event);
+            mEventBuffer.add(event); //time bounded buffer
             long minimumTimestamp = event.timestamp - (long)(1.5 * Math.pow(10,9));
             mEventBuffer.removeAll(mEventBuffer.subList(0,getNearestTimestampMatch(minimumTimestamp))); // dumps data that is a older than 1.5 seconds
+
             //algorithm
-            TreeMap<Long,Float> map = new TreeMap<>();
-            //math function converts the three waveforms to a single signal
-            for (SensorEvent e: mEventBuffer) {
-                double[] fValues =  mFilter.getFilteredValues(event.values);
-                for (int i = 0; i < fValues.length; i++) {
-                    fValues[i] = Math.pow(fValues[i]+100000, 2); // the addition and subtraction of 100000 lets negative values retain their meaning
+            if (mEventBuffer.size() < 3) {
+
+                //data set of 3 or fewer is not a sufficient sample size
+                TreeMap<Long, Float> map = new TreeMap<>();
+
+                //math function converts the three waveforms to a single signal
+                for (SensorEvent e : mEventBuffer) {
+                    double[] fValues = mFilter.getFilteredValues(event.values);
+                    for (int i = 0; i < fValues.length; i++) {
+                        fValues[i] = Math.pow(fValues[i] + 100000, 2); // the addition and subtraction of 100000 lets negative values retain their meaning
+                    }
+                    map.put(e.timestamp, (float) Math.sqrt(fValues[0] + fValues[1] + fValues[2]) - 100000);
                 }
-                map.put(e.timestamp, (float) Math.sqrt(fValues[0]+fValues[1]+fValues[2])-100000);
-            }
-            Collection<Float> list = map.values();
-            float upper = Collections.max(list);
-            float lower = Collections.min(list);
-            float center = (upper + lower)/2;
-            float minimumRange= (float)0.5;
-            // disregard noise at about center value
-            if (!(upper < center+minimumRange && lower > center-minimumRange)){
-                long top = getKeyByValue(upper,map);
-                long bottom = getKeyByValue(lower,map);
-                // down turn of a wave where the slope is negative
-                if (top < bottom){
-                    onStepDetected(bottom,event.values);
-                    mEventBuffer.clear(); //dump current window to prevent further analysis on that set of data
+
+                Collection<Float> list = map.values();
+                float upper = Collections.max(list);
+                float lower = Collections.min(list);
+                float center = (upper + lower) / 2;
+
+                // disregard noise at about center value
+                if (!(upper < center + minimumRange && lower > center - minimumRange)) {
+                    long top = getKeyByValue(upper, map);
+                    long bottom = getKeyByValue(lower, map);
+                    // down turn of a wave where the slope is negative
+                    if (top < bottom) {
+                        stepCount++;
+                        onStepDetected(bottom, event.values); // send step signal
+                        mEventBuffer.clear(); //dump current window to prevent further analysis on that set of data
+                    }
                 }
+                map.clear(); //gc
             }
-            map.clear(); //gc
 
         }
     }
