@@ -107,6 +107,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     private int mAndroidStepCount = 0;
 
     private int serverStepCount = 0;
+    private int mLocalStepCount = 0;
 
     private Filter mfilter;
     public AccelerometerService(){
@@ -174,7 +175,6 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         OnStepListener stepListener = new OnStepListener() {
             @Override
             public void onStepCountUpdated(int stepCount) {
-                broadcastLocalStepCount(stepCount);
             }
 
             @Override
@@ -193,9 +193,9 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     protected void unregisterSensors() {
         //TODO : Unregister your sensors. Make sure mSensorManager is not null before calling its unregisterListener method.
         if(mSensorManager != null) {
-            mSensorManager.unregisterListener(this);
-            mSensorManager.unregisterListener(mStepDetector);
             mStepDetector.unregisterOnStepListeners();
+            mSensorManager.unregisterListener(mStepDetector);
+            mSensorManager.unregisterListener(this);
         }
     }
 
