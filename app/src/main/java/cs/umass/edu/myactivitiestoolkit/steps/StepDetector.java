@@ -3,9 +3,14 @@ package cs.umass.edu.myactivitiestoolkit.steps;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import cs.umass.edu.myactivitiestoolkit.processing.Filter;
 
@@ -17,19 +22,29 @@ import cs.umass.edu.myactivitiestoolkit.processing.Filter;
 public class StepDetector implements SensorEventListener {
     /** Used for debugging purposes. */
     @SuppressWarnings("unused")
+
     private static final String TAG = StepDetector.class.getName();
 
     /** Maintains the set of listeners registered to handle step events. **/
     private ArrayList<OnStepListener> mStepListeners;
 
+    private ArrayList<SensorEvent> mEventBuffer;
     /**
      * The number of steps taken.
      */
     private int stepCount;
+    private Filter mFilter;
+
+    //tweakable values
+    private float minimumRange = 0.5f; //noise with a occurs within a bound that occurs <minimumRange> around the center
+    private int smoothingFactor = 2; //smoothing factor for the filter within the StepDetector
 
     public StepDetector(){
         mStepListeners = new ArrayList<>();
+        mEventBuffer = new ArrayList<>();
         stepCount = 0;
+        mFilter = new Filter(smoothingFactor);
+
     }
 
     /**
@@ -69,10 +84,84 @@ public class StepDetector implements SensorEventListener {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
             //TODO: Detect steps! Call onStepDetected(...) when a step is detected.
+            mEventBuffer.add(event); //time bounded buffer
+            long minimumTimestamp = event.timestamp - (long) (1.5 * Math.pow(10, 9));
+            int upperRange = getNearestTimestampMatch(minimumTimestamp);
+            if (upperRange != -1) // If getNearestTimestampMatch() doesn't get a match
+            {
+                mEventBuffer.removeAll(mEventBuffer.subList(0, getNearestTimestampMatch(minimumTimestamp))); // dumps data that is a older than 1.5 seconds
+            }
+
+            //algorithm
+            if (mEventBuffer.size() > 3) {
+
+                //data set of 3 or fewer is not a sufficient sample size
+                TreeMap<Long, Float> map = new TreeMap<>();
+
+                //math function converts the three waveforms to a single signal
+                for (SensorEvent e : mEventBuffer) {
+                    double[] fValues = mFilter.getFilteredValues(event.values);
+                    for (int i = 0; i < fValues.length; i++) {
+                        fValues[i] = Math.pow(fValues[i], 2);
+                    }
+                    double combined = Math.sqrt(fValues[0] + fValues[1] + fValues[2]);
+                    map.put(e.timestamp, (float) combined);
+                }
+
+                Collection<Float> list = map.values();
+                float upper = Collections.max(list);
+                float lower = Collections.min(list);
+                float center = (upper + lower) / 2;
+
+                // disregard noise at about center value
+                if (!(upper < center + minimumRange && lower > center - minimumRange)) {
+                    long top = getKeyByValue(upper, map);
+                    long bottom = getKeyByValue(lower, map);
+                    // down turn of a wave where the slope is negative
+                    if (top < bottom) {
+                        onStepDetected(bottom, event.values); // send step signal
+                        mEventBuffer.clear(); //dump current window to prevent further analysis on that set of data
+                    }
+                }
+                map.clear(); //gc
+            }
 
         }
     }
+    private long getKeyByValue(float value,Map<Long,Float> map){
+        long result = -1;
+        for (long key :
+                map.keySet()) {
+            if (map.get(key).equals(value)) {
+                result = key;
+            }
+        }
+        return result;
+    }
 
+    /*
+    *   returns index of nearest timestamp that is below the specified
+    *   returns -1 if none found
+    *
+    * */
+    private int getNearestTimestampMatch(long timestamp)
+    {
+        int result = -1;
+        long[] timestampArray = new long[mEventBuffer.size()];
+        TreeSet<Long> set = new TreeSet<>();
+        for (int i = 0; i < mEventBuffer.size(); i++) {
+            long stamp = mEventBuffer.get(i).timestamp;
+            timestampArray[i] = stamp;
+            set.add(stamp);
+        }
+        Object item = set.floor(timestamp);
+        if (null == item) {
+            return result;
+        }
+        result = Arrays.binarySearch(timestampArray, (Long) item);
+        set.clear();
+        return result;
+    }
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
         // do nothing
