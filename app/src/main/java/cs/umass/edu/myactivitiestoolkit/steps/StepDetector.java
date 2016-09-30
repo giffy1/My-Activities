@@ -3,16 +3,12 @@ package cs.umass.edu.myactivitiestoolkit.steps;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.util.Log;
-
-import org.apache.commons.lang.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.NavigableSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -106,7 +102,7 @@ public class StepDetector implements SensorEventListener {
                 for (SensorEvent e : mEventBuffer) {
                     double[] fValues = mFilter.getFilteredValues(event.values);
                     for (int i = 0; i < fValues.length; i++) {
-                        fValues[i] = Math.pow(fValues[i], 2); // the addition and subtraction of 100000 lets negative values retain their meaning
+                        fValues[i] = Math.pow(fValues[i], 2);
                     }
                     double combined = Math.sqrt(fValues[0] + fValues[1] + fValues[2]);
                     map.put(e.timestamp, (float) combined);
