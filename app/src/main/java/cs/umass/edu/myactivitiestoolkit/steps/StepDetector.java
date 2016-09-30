@@ -85,10 +85,9 @@ public class StepDetector implements SensorEventListener {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
             //TODO: Detect steps! Call onStepDetected(...) when a step is detected.
-
             mEventBuffer.add(event); //time bounded buffer
             long minimumTimestamp = event.timestamp - (long)(1.5 * Math.pow(10,9));
-            mEventBuffer.removeAll(mEventBuffer.subList(0,getNearestTimestampMatch(minimumTimestamp))); // dumps data that is a older than 1.5 seconds
+//            mEventBuffer.removeAll(mEventBuffer.subList(0,getNearestTimestampMatch(minimumTimestamp))); // dumps data that is a older than 1.5 seconds
 
             //algorithm
             if (mEventBuffer.size() < 3) {

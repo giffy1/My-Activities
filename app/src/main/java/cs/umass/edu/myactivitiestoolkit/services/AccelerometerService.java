@@ -175,6 +175,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         OnStepListener stepListener = new OnStepListener() {
             @Override
             public void onStepCountUpdated(int stepCount) {
+                broadcastLocalStepCount(stepCount);
             }
 
             @Override
@@ -182,7 +183,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
             }
         };
 
-        mSensorManager.registerListener(mStepDetector, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(mStepDetector, mAccelerometerSensor, SensorManager.SENSOR_DELAY_UI);
         mStepDetector.registerOnStepListener(stepListener);
     }
 
