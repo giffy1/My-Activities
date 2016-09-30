@@ -3,6 +3,9 @@ package cs.umass.edu.myactivitiestoolkit.steps;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.util.Log;
+
+import org.apache.commons.lang.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,13 +88,16 @@ public class StepDetector implements SensorEventListener {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
             //TODO: Detect steps! Call onStepDetected(...) when a step is detected.
-
             mEventBuffer.add(event); //time bounded buffer
-            long minimumTimestamp = event.timestamp - (long)(1.5 * Math.pow(10,9));
-            mEventBuffer.removeAll(mEventBuffer.subList(0,getNearestTimestampMatch(minimumTimestamp))); // dumps data that is a older than 1.5 seconds
+            long minimumTimestamp = event.timestamp - (long) (1.5 * Math.pow(10, 9));
+            int upperRange = getNearestTimestampMatch(minimumTimestamp);
+            if (upperRange != -1) // If getNearestTimestampMatch() doesn't get a match
+            {
+                mEventBuffer.removeAll(mEventBuffer.subList(0, getNearestTimestampMatch(minimumTimestamp))); // dumps data that is a older than 1.5 seconds
+            }
 
             //algorithm
-            if (mEventBuffer.size() < 3) {
+            if (mEventBuffer.size() > 3) {
 
                 //data set of 3 or fewer is not a sufficient sample size
                 TreeMap<Long, Float> map = new TreeMap<>();
@@ -100,9 +106,10 @@ public class StepDetector implements SensorEventListener {
                 for (SensorEvent e : mEventBuffer) {
                     double[] fValues = mFilter.getFilteredValues(event.values);
                     for (int i = 0; i < fValues.length; i++) {
-                        fValues[i] = Math.pow(fValues[i] + 100000, 2); // the addition and subtraction of 100000 lets negative values retain their meaning
+                        fValues[i] = Math.pow(fValues[i], 2); // the addition and subtraction of 100000 lets negative values retain their meaning
                     }
-                    map.put(e.timestamp, (float) Math.sqrt(fValues[0] + fValues[1] + fValues[2]) - 100000);
+                    double combined = Math.sqrt(fValues[0] + fValues[1] + fValues[2]);
+                    map.put(e.timestamp, (float) combined);
                 }
 
                 Collection<Float> list = map.values();
@@ -116,7 +123,6 @@ public class StepDetector implements SensorEventListener {
                     long bottom = getKeyByValue(lower, map);
                     // down turn of a wave where the slope is negative
                     if (top < bottom) {
-                        stepCount++;
                         onStepDetected(bottom, event.values); // send step signal
                         mEventBuffer.clear(); //dump current window to prevent further analysis on that set of data
                     }
@@ -136,17 +142,29 @@ public class StepDetector implements SensorEventListener {
         }
         return result;
     }
+
+    /*
+    *   returns index of nearest timestamp that is below the specified
+    *   returns -1 if none found
+    *
+    * */
     private int getNearestTimestampMatch(long timestamp)
     {
+        int result = -1;
         long[] timestampArray = new long[mEventBuffer.size()];
-        NavigableSet<Long> set = new TreeSet<>();
+        TreeSet<Long> set = new TreeSet<>();
         for (int i = 0; i < mEventBuffer.size(); i++) {
             long stamp = mEventBuffer.get(i).timestamp;
             timestampArray[i] = stamp;
             set.add(stamp);
         }
-        long item = set.floor(timestamp);
-        return Arrays.binarySearch(timestampArray,item);
+        Object item = set.floor(timestamp);
+        if (null == item) {
+            return result;
+        }
+        result = Arrays.binarySearch(timestampArray, (Long) item);
+        set.clear();
+        return result;
     }
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
