@@ -18,6 +18,7 @@ public class Constants {
         String BROADCAST_ACCELEROMETER_DATA = "edu.umass.cs.my-activities-toolkit.action.broadcast-accelerometer-data";
         String BROADCAST_ANDROID_STEP_COUNT = "edu.umass.cs.my-activities-toolkit.action.broadcast-android-step-count";
         String BROADCAST_LOCAL_STEP_COUNT = "edu.umass.cs.my-activities-toolkit.action.broadcast-local-step-count";
+        String BROADCAST_SERVER_STEP_COUNT = "edu.umass.cs.my-activities-toolkit.action.broadcast-server-step-count";
         String BROADCAST_ACTIVITY = "edu.umass.cs.my-activities-toolkit.action.broadcast-activity";
         String BROADCAST_PPG = "edu.umass.cs.my-activities-toolkit.action.broadcast-ppg";
         String BROADCAST_PPG_PEAK = "edu.umass.cs.my-activities-toolkit.action.broadcast-ppg-peak";
@@ -101,7 +102,7 @@ public class Constants {
      * </pre>
      */
     public interface MHLClientFilter {
-        String STEP_DETECTED = "STEP_DETECTED";
+        String STEP_DETECTED = "SENSOR_STEP";
         String ACTIVITY_DETECTED = "ACTIVITY_DETECTED";
         String SPEAKER_DETECTED = "SPEAKER_DETECTED";
         String CLUSTER = "CLUSTER";

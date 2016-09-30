@@ -205,6 +205,9 @@ public class ExerciseFragment extends Fragment {
                 } else if (intent.getAction().equals(Constants.ACTION.BROADCAST_LOCAL_STEP_COUNT)) {
                     int stepCount = intent.getIntExtra(Constants.KEY.STEP_COUNT, 0);
                     displayLocalStepCount(stepCount);
+                } else if (intent.getAction().equals(Constants.ACTION.BROADCAST_SERVER_STEP_COUNT)) {
+                    int stepCount = intent.getIntExtra(Constants.KEY.STEP_COUNT, 0);
+                    displayServerStepCount(stepCount);
                 } else if (intent.getAction().equals(Constants.ACTION.BROADCAST_ACCELEROMETER_PEAK)){
                     long timestamp = intent.getLongExtra(Constants.KEY.ACCELEROMETER_PEAK_TIMESTAMP, -1);
                     float[] values = intent.getFloatArrayExtra(Constants.KEY.ACCELEROMETER_PEAK_VALUE);
@@ -330,6 +333,7 @@ public class ExerciseFragment extends Fragment {
         filter.addAction(Constants.ACTION.BROADCAST_ACCELEROMETER_PEAK);
         filter.addAction(Constants.ACTION.BROADCAST_ANDROID_STEP_COUNT);
         filter.addAction(Constants.ACTION.BROADCAST_LOCAL_STEP_COUNT);
+        filter.addAction(Constants.ACTION.BROADCAST_SERVER_STEP_COUNT);
         broadcastManager.registerReceiver(receiver, filter);
     }
 
@@ -385,6 +389,19 @@ public class ExerciseFragment extends Fragment {
             @Override
             public void run() {
                 txtAndroidStepCount.setText(String.format(Locale.getDefault(), getString(R.string.android_step_count), stepCount));
+            }
+        });
+    }
+
+    /**
+     * Displays the step count as computed by the server step detection algorithm.
+     * @param stepCount the number of steps taken since the service started
+     */
+    private void displayServerStepCount(final int stepCount){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                txtServerStepCount.setText(String.format(Locale.getDefault(), getString(R.string.server_step_count), stepCount));
             }
         });
     }
