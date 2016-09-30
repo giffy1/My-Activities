@@ -330,6 +330,7 @@ public class ExerciseFragment extends Fragment {
         filter.addAction(Constants.ACTION.BROADCAST_ACCELEROMETER_PEAK);
         filter.addAction(Constants.ACTION.BROADCAST_ANDROID_STEP_COUNT);
         filter.addAction(Constants.ACTION.BROADCAST_LOCAL_STEP_COUNT);
+        filter.addAction(Constants.ACTION.BROADCAST_SERVER_STEP_COUNT);
         broadcastManager.registerReceiver(receiver, filter);
     }
 

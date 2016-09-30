@@ -171,7 +171,6 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         OnStepListener stepListener = new OnStepListener() {
             @Override
             public void onStepCountUpdated(int stepCount) {
-                broadcastLocalStepCount(stepCount);
             }
 
             @Override
@@ -190,9 +189,9 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     protected void unregisterSensors() {
         //TODO : Unregister your sensors. Make sure mSensorManager is not null before calling its unregisterListener method.
         if(mSensorManager != null) {
-            mSensorManager.unregisterListener(this);
-            mSensorManager.unregisterListener(mStepDetector);
             mStepDetector.unregisterOnStepListeners();
+            mSensorManager.unregisterListener(mStepDetector);
+            mSensorManager.unregisterListener(this);
         }
     }
 
@@ -329,6 +328,13 @@ public class AccelerometerService extends SensorService implements SensorEventLi
 
 
     // TODO: (Assignment 1) Broadcast the step count as computed by your server-side algorithm.
+    public void broadcastServerStepCount(int stepCount) {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.MHLClientFilter.STEP_DETECTED, stepCount);
+        intent.setAction(Constants.ACTION.BROADCAST_SERVER_STEP_COUNT);
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+        manager.sendBroadcast(intent);
+    }
 
     /**
      * Broadcasts a step event to other application components, e.g. the main UI.
