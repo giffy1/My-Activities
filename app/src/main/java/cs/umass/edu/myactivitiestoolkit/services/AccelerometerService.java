@@ -273,6 +273,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
 
             // we received a step event detected by the built-in Android step detector (assignment 1)
             broadcastAndroidStepCount(mAndroidStepCount++);
+            broadcastLocalStepCount(mStepDetector.stepCount);
 
         } else {
 
