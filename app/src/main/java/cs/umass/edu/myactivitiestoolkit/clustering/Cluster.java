@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Cluster<T extends Clusterable<T>> {
     private ArrayList<T> points;
     public Cluster(){
-        points = new ArrayList<T>();
+        points = new ArrayList<>();
     }
 
     /**
