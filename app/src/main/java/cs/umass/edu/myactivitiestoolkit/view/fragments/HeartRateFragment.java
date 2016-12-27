@@ -61,13 +61,13 @@ import cs.umass.edu.myactivitiestoolkit.util.PermissionsUtil;
  * <br><br>
  * You may want to modify the UI design, but you are not required to make any changes to
  * the file. You are only expected to make the appropriate changes in {@link PPGService}
- * and {@link cs.umass.edu.myactivitiestoolkit.ppg.HeartRateCameraView}.
+ * and {@link cs.umass.edu.myactivitiestoolkit.ppg.PPGSensor}.
  *
  * @author Sean Noran
  *
  * @see XYPlot
  * @see PPGService
- * @see cs.umass.edu.myactivitiestoolkit.ppg.HeartRateCameraView
+ * @see cs.umass.edu.myactivitiestoolkit.ppg.PPGSensor
  * @see Fragment
  */
 public class HeartRateFragment extends Fragment {
