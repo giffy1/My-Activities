@@ -84,10 +84,10 @@ public class DBScan<T extends Clusterable<T>> {
      */
     public List<Cluster<T>> cluster(final Collection<T> points) {
         /** the list of clusters - the algorithm will populate these */
-        List<Cluster<T>> clusters = new ArrayList<Cluster<T>>();
+        List<Cluster<T>> clusters = new ArrayList<>();
 
         /** maps a point T to true or false, indicating whether that point has been visited or not */
-        Map<T, State> states = new HashMap<T, State>();
+        Map<T, State> states = new HashMap<>();
 
         //initialize all points' state to UNVISITED
         for (final T p : points){
@@ -98,7 +98,7 @@ public class DBScan<T extends Clusterable<T>> {
 
         //TODO: The following block of code adds all points to a single cluster. Make sure to remove this!
         {
-            Cluster<T> fakeCluster = new Cluster<T>();
+            Cluster<T> fakeCluster = new Cluster<>();
             for (final T p : points)
                 fakeCluster.addPoint(p);
             clusters.add(fakeCluster);
@@ -139,7 +139,7 @@ public class DBScan<T extends Clusterable<T>> {
      */
     private List<T> regionQuery(final T p, final Collection<T> points) {
         //TODO: Query the region around point p to get its neighbors, that is all points within eps of p
-        final List<T> neighbors = new ArrayList<T>();
+        final List<T> neighbors = new ArrayList<>();
         return neighbors;
     }
 
