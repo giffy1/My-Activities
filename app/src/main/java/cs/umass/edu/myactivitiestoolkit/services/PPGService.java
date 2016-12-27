@@ -14,16 +14,14 @@ import cs.umass.edu.myactivitiestoolkit.R;
 import cs.umass.edu.myactivitiestoolkit.ppg.HRSensorReading;
 import cs.umass.edu.myactivitiestoolkit.ppg.PPGSensorReading;
 import cs.umass.edu.myactivitiestoolkit.constants.Constants;
-import cs.umass.edu.myactivitiestoolkit.ppg.HeartRateCameraView;
+import cs.umass.edu.myactivitiestoolkit.ppg.PPGSensor;
 import cs.umass.edu.myactivitiestoolkit.ppg.PPGEvent;
 import cs.umass.edu.myactivitiestoolkit.ppg.PPGListener;
-import cs.umass.edu.myactivitiestoolkit.processing.FFT;
 import cs.umass.edu.myactivitiestoolkit.processing.Filter;
-import cs.umass.edu.myactivitiestoolkit.util.Interpolator;
 import edu.umass.cs.MHLClient.client.MobileIOClient;
 
 /**
- * Photoplethysmography service. This service uses a {@link HeartRateCameraView}
+ * Photoplethysmography service. This service uses a {@link PPGSensor}
  * to collect PPG data using a standard camera with continuous flash. This is where
  * you will do most of your work for this assignment.
  * <br><br>
@@ -41,7 +39,7 @@ import edu.umass.cs.MHLClient.client.MobileIOClient;
  *
  * @author CS390MB
  *
- * @see HeartRateCameraView
+ * @see PPGSensor
  * @see PPGEvent
  * @see PPGListener
  * @see Filter
@@ -56,12 +54,12 @@ public class PPGService extends SensorService implements PPGListener
     private static final String TAG = PPGService.class.getName();
 
     /* Surface view responsible for collecting PPG data and displaying the camera preview. */
-    private HeartRateCameraView mPPGSensor;
+    private PPGSensor mPPGSensor;
 
     @Override
     protected void start() {
         Log.d(TAG, "START");
-        mPPGSensor = new HeartRateCameraView(getApplicationContext(), null);
+        mPPGSensor = new PPGSensor(getApplicationContext(), null);
 
         WindowManager winMan = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
@@ -84,7 +82,7 @@ public class PPGService extends SensorService implements PPGListener
         mPPGSensor.setZOrderOnTop(true);
 
         // only once the surface has been created can we start the PPG sensor
-        mPPGSensor.setSurfaceCreatedCallback(new HeartRateCameraView.SurfaceCreatedCallback() {
+        mPPGSensor.setSurfaceCreatedCallback(new PPGSensor.SurfaceCreatedCallback() {
             @Override
             public void onSurfaceCreated() {
                 mPPGSensor.start(); //start recording PPG
@@ -151,7 +149,7 @@ public class PPGService extends SensorService implements PPGListener
      *
      * @see PPGEvent
      * @see PPGSensorReading
-     * @see HeartRateCameraView#onPreviewFrame(byte[], Camera)
+     * @see PPGSensor#onPreviewFrame(byte[], Camera)
      * @see MobileIOClient
      * @see HRSensorReading
      */
