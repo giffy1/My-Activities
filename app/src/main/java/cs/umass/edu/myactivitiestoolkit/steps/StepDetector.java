@@ -1,20 +1,15 @@
 package cs.umass.edu.myactivitiestoolkit.steps;
 
-import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.util.Log;
 
 import java.util.ArrayList;
-
-import cs.umass.edu.myactivitiestoolkit.processing.Filter;
 
 /**
  * This class is responsible for detecting steps from the accelerometer sensor.
  * All {@link OnStepListener step listeners} that have been registered will
  * be notified when a step is detected.
  */
-public class StepDetector implements SensorEventListener {
+public class StepDetector {
     /** Used for debugging purposes. */
     @SuppressWarnings("unused")
     private static final String TAG = StepDetector.class.getName();
@@ -64,18 +59,8 @@ public class StepDetector implements SensorEventListener {
      *
      * @param event sensor reading
      */
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-
-            //TODO: Detect steps! Call onStepDetected(...) when a step is detected.
-
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-        // do nothing
+    public void detectSteps(SensorEvent event) {
+        //TODO: Detect steps! Call onStepDetected(...) when a step is detected.
     }
 
     /**
