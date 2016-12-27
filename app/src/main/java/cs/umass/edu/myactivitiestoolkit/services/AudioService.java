@@ -60,7 +60,7 @@ public class AudioService extends SensorService implements MicrophoneRecorder.Mi
     }
 
     protected void registerSensors() {
-        mMicrophoneRecorder = MicrophoneRecorder.getInstance(this);
+        mMicrophoneRecorder = MicrophoneRecorder.getInstance();
 
         Log.d(TAG, "Starting microphone.");
         mMicrophoneRecorder.registerListener(this);

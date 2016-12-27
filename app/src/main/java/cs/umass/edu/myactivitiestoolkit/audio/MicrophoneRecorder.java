@@ -1,19 +1,12 @@
 package cs.umass.edu.myactivitiestoolkit.audio;
 
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.LinkedList;
-
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.os.Environment;
 import android.util.Log;
+
+import java.util.LinkedList;
 
 /**
  * 
@@ -35,24 +28,21 @@ public class MicrophoneRecorder extends Thread{
 	@SuppressWarnings("unused")
 	private static final String TAG = MicrophoneRecorder.class.getName();
 
-	private Context context;
-	
 	public static int frequency = 8000;
 	public static int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	public static int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 
-	private MicrophoneRecorder(Context context){
-		this.context = context;
+	private MicrophoneRecorder(){
 	}
 	
 	public static MicrophoneRecorder instance = null;
 	
-	private final LinkedList<MicrophoneListener> listeners = new LinkedList<MicrophoneListener>();
+	private final LinkedList<MicrophoneListener> listeners = new LinkedList<>();
 	private boolean isRecording = false;
 	
-	public static MicrophoneRecorder getInstance(Context context){
+	public static MicrophoneRecorder getInstance(){
 		if (instance ==null){
-			instance = new MicrophoneRecorder(context);
+			instance = new MicrophoneRecorder();
 		}
 		return instance;
 	}
