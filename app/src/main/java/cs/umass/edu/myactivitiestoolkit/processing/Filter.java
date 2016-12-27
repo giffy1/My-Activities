@@ -37,7 +37,7 @@ public class Filter {
 
 	/**
 	 * Use this constructor to use an exponential smoothing filter
-	 * @param smoothFactor the factor by which to smooth the data, in the range [0, 1]
+	 * @param smoothFactor the factor by which to smooth the data, an integer greater than or equal to 1.
 	 */
 	public Filter(int smoothFactor) {
 		FILTER_TYPE = FilterType.SMOOTHING;
