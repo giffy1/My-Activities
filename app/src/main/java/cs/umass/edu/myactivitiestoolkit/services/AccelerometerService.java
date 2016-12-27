@@ -5,19 +5,18 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Locale;
+import java.io.BufferedWriter;
 
 import cs.umass.edu.myactivitiestoolkit.R;
 import cs.umass.edu.myactivitiestoolkit.constants.Constants;
 import cs.umass.edu.myactivitiestoolkit.steps.StepDetector;
+import cs.umass.edu.myactivitiestoolkit.storage.FileUtil;
 import edu.umass.cs.MHLClient.client.MessageReceiver;
 import edu.umass.cs.MHLClient.client.MobileIOClient;
 import edu.umass.cs.MHLClient.sensors.AccelerometerReading;
@@ -140,7 +139,6 @@ public class AccelerometerService extends SensorService implements SensorEventLi
                     activity = data.getString("activity");
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    return;
                 }
                 // TODO : broadcast activity to UI
             }
@@ -153,9 +151,11 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     @Override
     protected void registerSensors(){
 
-        //TODO : (Assignment 0) Register the accelerometer sensor from the sensor manager.
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
-        //TODO : (Assignment 1) Register your step detector. Register an OnStepListener to receive step events
+        //TODO : (Assignment 0) Register the accelerometer sensor from the sensor manager.
     }
 
     /**
@@ -219,6 +219,8 @@ public class AccelerometerService extends SensorService implements SensorEventLi
 
             //TODO: broadcast the accelerometer reading to the UI
 
+            //TODO: (Assignment 1) Call the detectSteps method in the StepDetector class
+
         }else if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
 
             // we received a step event detected by the built-in Android step detector (assignment 1)
@@ -243,6 +245,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
      */
     public void broadcastAccelerometerReading(final long timestamp, final float[] accelerometerReadings) {
         Intent intent = new Intent();
+        intent.putExtra(Constants.KEY.TIMESTAMP, timestamp);
         intent.putExtra(Constants.KEY.ACCELEROMETER_DATA, accelerometerReadings);
         intent.setAction(Constants.ACTION.BROADCAST_ACCELEROMETER_DATA);
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
