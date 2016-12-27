@@ -1,5 +1,9 @@
 package cs.umass.edu.myactivitiestoolkit.clustering;
 
+import android.annotation.TargetApi;
+import android.os.Build;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,33 +23,47 @@ public class ClusteringRequest extends SensorReading {
     /** The clustering algorithm. **/
     private final String algorithm;
 
-    /** The clustering parameter set. **/
-    private final Object[] params;
+    private final double[] latitudes, longitudes;
+
+    private final int k;
 
     /**
      * Instantiates a PPG reading.
      * @param userID a 10-byte hex string identifying the current user.
      * @param deviceType describes the device.
      * @param deviceID unique device identifier.
+     * @param locations the locations to cluster
      * @param t the timestamp at which the event occurred, in Unix time by convention.
      * @param algorithm the clustering algorithm.
+     * @param k The number of clusters if algorithm is K-Means. If the algorithm is Mean-Shift, this is ignored.
      */
-    public ClusteringRequest(String userID, String deviceType, String deviceID, long t, String algorithm, Object... params){
+    public ClusteringRequest(String userID, String deviceType, String deviceID, long t, GPSLocation[] locations, String algorithm, int k){
         super(userID, deviceType, deviceID, "SENSOR_CLUSTERING_REQUEST", t);
 
         this.algorithm = algorithm;
-        this.params = params;
+        this.k = k;
+        this.latitudes = new double[locations.length];
+        this.longitudes = new double[locations.length];
+        for (int i = 0; i < locations.length; i++){
+            latitudes[i] = locations[i].latitude;
+            longitudes[i] = locations[i].longitude;
+        }
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected JSONObject toJSONObject(){
         JSONObject obj = getBaseJSONObject();
         JSONObject data = new JSONObject();
 
         try {
+            JSONArray latitudeArray = new JSONArray(latitudes);
+            JSONArray longitudeArray = new JSONArray(longitudes);
             data.put("t", timestamp);
+            data.put("longitudes", longitudeArray);
+            data.put("latitudes", latitudeArray);
             data.put("algorithm", algorithm);
-            data.put("parameters", params);
+            data.put("k", k);
 
             obj.put("data", data);
         } catch (JSONException e) {
