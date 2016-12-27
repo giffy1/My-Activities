@@ -283,7 +283,7 @@ public class ExerciseFragment extends Fragment {
                 return null;
             }
         });
-        mPlot.setPlotPaddingBottom(-150); //TODO: This isn't device-dependent, and may need to be changed.
+        mPlot.setPlotPaddingBottom(-150); //TODO: This isn't device-dependent, might need to be changed if the plot/legend is cut off
         mPlot.getLegend().setPaddingBottom(280);
 
         // set formatting parameters for each signal (accelerometer and accelerometer peaks)
