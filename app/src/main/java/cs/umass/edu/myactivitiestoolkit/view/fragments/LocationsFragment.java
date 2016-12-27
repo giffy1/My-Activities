@@ -162,7 +162,7 @@ public class LocationsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         serviceManager = ServiceManager.getInstance(getActivity());
         userID = getString(R.string.mobile_health_client_user_id);
-        client = MobileIOClient.getInstance(userID);
+        client = MobileIOClient.getInstance(getActivity(), userID);
     }
 
     @Override
