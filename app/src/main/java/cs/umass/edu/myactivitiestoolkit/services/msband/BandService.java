@@ -172,31 +172,11 @@ public class BandService extends SensorService implements BandGyroscopeEventList
 
     @Override
     public void onBandGyroscopeChanged(BandGyroscopeEvent event) {
-        //TODO: Remove code from starter code
         Object[] data = new Object[]{event.getTimestamp(),
                 event.getAccelerationX(), event.getAccelerationY(), event.getAccelerationZ(),
                 event.getAngularVelocityX(), event.getAngularVelocityY(), event.getAngularVelocityZ()};
-        mClient.sendSensorReading(new AccelerometerReading(mUserID, "", "", event.getTimestamp(),
-                event.getAccelerationX(), event.getAccelerationY(), event.getAccelerationZ()));
-        broadcastAccelerometerReading(event.getTimestamp(),
-                event.getAccelerationX(), event.getAccelerationY(), event.getAccelerationZ());
-        mClient.sendSensorReading(new GyroscopeReading(mUserID, "", "", event.getTimestamp(),
-                event.getAngularVelocityX(), event.getAngularVelocityY(), event.getAngularVelocityZ()));
+        // TODO: Send accelerometer readings to server and UI
         String sample = TextUtils.join(",", data);
         Log.d(TAG, sample);
-    }
-
-    //TODO: Remove method from starter code
-    /**
-     * Broadcasts the accelerometer reading to other application components, e.g. the main UI.
-     * @param accelerometerReadings the x, y, and z accelerometer readings
-     */
-    public void broadcastAccelerometerReading(final long timestamp, final float... accelerometerReadings) {
-        Intent intent = new Intent();
-        intent.putExtra(Constants.KEY.TIMESTAMP, timestamp);
-        intent.putExtra(Constants.KEY.ACCELEROMETER_DATA, accelerometerReadings);
-        intent.setAction(Constants.ACTION.BROADCAST_ACCELEROMETER_DATA);
-        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
-        manager.sendBroadcast(intent);
     }
 }
