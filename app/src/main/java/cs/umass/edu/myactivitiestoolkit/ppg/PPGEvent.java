@@ -12,7 +12,7 @@ public class PPGEvent {
     public double value;
     public long timestamp;
 
-    public PPGEvent(final double value, final long timestamp){
+    public PPGEvent(final long timestamp, final double value){
         this.value = value;
         this.timestamp = timestamp;
     }
